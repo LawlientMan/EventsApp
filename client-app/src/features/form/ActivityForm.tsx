@@ -1,16 +1,12 @@
+import { observer } from 'mobx-react-lite'
 import React, { ChangeEvent, useState } from 'react'
 import { Button, Form, Segment } from 'semantic-ui-react'
-import { Activity } from '../../app/models/Activity'
+import { useStore } from '../../app/stores/store'
 
-interface Props{
-  activity: Activity | undefined,
-  closeForm: () => void,
-  createOrEditActivity: (activity:Activity) => void,
-  submitting: boolean
-}
+const ActivityForm = () => {
+  const {activityStore} = useStore();
+  const {selectedActivity, closeForm, loading, createActivity, editActivity} = activityStore;
 
-const ActivityForm = ({activity: selectedActivity, closeForm, createOrEditActivity,
-  submitting}:Props) => {
   const initialState = selectedActivity ?? {
     id: '',
     title: '',
@@ -23,8 +19,7 @@ const ActivityForm = ({activity: selectedActivity, closeForm, createOrEditActivi
 
   const [activity, setActivity] = useState(initialState);
   function handleSubmit(){
-    console.log(activity);
-    createOrEditActivity(activity);
+    activity.id ? editActivity(activity) : createActivity(activity);
   }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>){
@@ -43,7 +38,7 @@ const ActivityForm = ({activity: selectedActivity, closeForm, createOrEditActivi
             <Form.Input type='date' placeholder='Date' value={activity.date} name='date' onChange={handleInputChange}/>
             <Form.Input placeholder='City' value={activity.city} name='city' onChange={handleInputChange}/>
             <Form.Input placeholder='Venue' value={activity.venue} name='venue' onChange={handleInputChange}/>
-            <Button loading={submitting} floated='right' positive type='submit' content='Submit'/>
+            <Button loading={loading} floated='right' positive type='submit' content='Submit'/>
             <Button floated='right' type='submit' content='Cencel'
               onClick={()=> closeForm()}
             />
@@ -52,4 +47,4 @@ const ActivityForm = ({activity: selectedActivity, closeForm, createOrEditActivi
   )
 }
 
-export default ActivityForm
+export default observer(ActivityForm);

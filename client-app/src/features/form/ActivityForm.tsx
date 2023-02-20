@@ -1,13 +1,23 @@
 import { observer } from 'mobx-react-lite'
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
+import { Link, redirect, useNavigate, useParams } from 'react-router-dom'
 import { Button, Form, Segment } from 'semantic-ui-react'
+import LoadingComponent from '../../app/layout/LoadingComponent'
+import { Activity } from '../../app/models/Activity'
 import { useStore } from '../../app/stores/store'
+import { v4 as uuid } from 'uuid';
 
 const ActivityForm = () => {
-  const {activityStore} = useStore();
-  const {selectedActivity, closeForm, loading, createActivity, editActivity} = activityStore;
+  const { activityStore } = useStore();
+  const { loading, createActivity, editActivity, loadingInitial, loadActivity } = activityStore;
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const initialState = selectedActivity ?? {
+  useEffect(() => {
+    if (id) loadActivity(id).then(act => setActivity(act!));
+  }, [loadActivity, id]);
+
+  const [activity, setActivity] = useState<Activity>({
     id: '',
     title: '',
     date: '',
@@ -15,34 +25,36 @@ const ActivityForm = () => {
     category: '',
     city: '',
     venue: '',
-  };
+  });
 
-  const [activity, setActivity] = useState(initialState);
-  function handleSubmit(){
-    activity.id ? editActivity(activity) : createActivity(activity);
+  function handleSubmit() {
+    if (activity.id) {
+      editActivity(activity).then(()=> navigate(`/activities/${activity.id}`));
+    } else {
+      activity.id = uuid();
+      createActivity(activity).then(()=> navigate(`/activities/${activity.id}`));
+    }
   }
 
-  function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>){
-    const {name, value} = event.target;
-    setActivity({...activity, [name]:value})
+  function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const { name, value } = event.target;
+    setActivity({ ...activity, [name]: value })
   }
 
-
+  if (loadingInitial) return <LoadingComponent content='Loading...' />
 
   return (
     <Segment clearing>
-        <Form onSubmit={handleSubmit} autoComplete='off'>
-            <Form.Input placeholder='Title' value={activity.title} name='title' onChange={handleInputChange}/>
-            <Form.TextArea placeholder='Description' value={activity.description} name='description' onChange={handleInputChange}/>
-            <Form.Input placeholder='Category' value={activity.category} name='category' onChange={handleInputChange}/>
-            <Form.Input type='date' placeholder='Date' value={activity.date} name='date' onChange={handleInputChange}/>
-            <Form.Input placeholder='City' value={activity.city} name='city' onChange={handleInputChange}/>
-            <Form.Input placeholder='Venue' value={activity.venue} name='venue' onChange={handleInputChange}/>
-            <Button loading={loading} floated='right' positive type='submit' content='Submit'/>
-            <Button floated='right' type='submit' content='Cencel'
-              onClick={()=> closeForm()}
-            />
-        </Form>
+      <Form onSubmit={handleSubmit} autoComplete='off'>
+        <Form.Input placeholder='Title' value={activity.title} name='title' onChange={handleInputChange} />
+        <Form.TextArea placeholder='Description' value={activity.description} name='description' onChange={handleInputChange} />
+        <Form.Input placeholder='Category' value={activity.category} name='category' onChange={handleInputChange} />
+        <Form.Input type='date' placeholder='Date' value={activity.date} name='date' onChange={handleInputChange} />
+        <Form.Input placeholder='City' value={activity.city} name='city' onChange={handleInputChange} />
+        <Form.Input placeholder='Venue' value={activity.venue} name='venue' onChange={handleInputChange} />
+        <Button loading={loading} floated='right' positive type='submit' content='Submit' />
+        <Button as={Link} to='/activities' floated='right' type='submit' content='Cencel' />
+      </Form>
     </Segment>
   )
 }

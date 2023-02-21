@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Link, redirect, useNavigate, useParams } from 'react-router-dom'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, Form, Segment } from 'semantic-ui-react'
 import LoadingComponent from '../../app/layout/LoadingComponent'
 import { Activity } from '../../app/models/Activity'

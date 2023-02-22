@@ -1,7 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import React from 'react'
-import { Container, Header, Segment, TextArea } from 'semantic-ui-react';
-import { CommonServiceError } from '../../app/models/CommonServiceError';
+import { Container, Header, Segment } from 'semantic-ui-react';
 import { useStore } from '../../app/stores/store'
 
 const ServerError = () => {

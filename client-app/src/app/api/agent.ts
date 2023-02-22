@@ -1,8 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { Console } from 'console';
 import { toast } from 'react-toastify';
 import { Activity } from '../models/Activity';
-import { CommonServiceError } from '../models/CommonServiceError';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
 
@@ -15,10 +13,10 @@ axios.interceptors.response.use(async response => {
     await sleep(1000);
     return response;
 }, (error: AxiosError) => {
-    const { data, status, config} = error.response as AxiosResponse;
+    const { data, status, config } = error.response as AxiosResponse;
     switch (status) {
         case 400:
-            if(config.method == 'get' && data.errors.hasOwnProperty('id')){
+            if (config.method === 'get' && data.errors?.hasOwnProperty('id')) {
                 router.navigate('/not-found');
             }
             if (data.errors) {

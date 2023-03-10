@@ -1092,6 +1092,19 @@
           "bin/placeholder/Domain.dll": {}
         }
       },
+      "Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "Application": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Infrastructure.dll": {}
+        }
+      },
       "Persistence/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
@@ -2861,6 +2874,11 @@
       "path": "../Domain/Domain.csproj",
       "msbuildProject": "../Domain/Domain.csproj"
     },
+    "Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../Infrastructure/Infrastructure.csproj",
+      "msbuildProject": "../Infrastructure/Infrastructure.csproj"
+    },
     "Persistence/1.0.0": {
       "type": "project",
       "path": "../Persistence/Persistence.csproj",
@@ -2870,6 +2888,7 @@
   "projectFileDependencyGroups": {
     "net7.0": [
       "Application >= 1.0.0",
+      "Infrastructure >= 1.0.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 7.0.3",
       "Microsoft.AspNetCore.OpenApi >= 7.0.1",
       "Microsoft.EntityFrameworkCore.Design >= 7.0.2",
@@ -2913,6 +2932,9 @@
           "projectReferences": {
             "C:\\OwnProjects\\DotNetWithReact\\Reactivities\\Application\\Application.csproj": {
               "projectPath": "C:\\OwnProjects\\DotNetWithReact\\Reactivities\\Application\\Application.csproj"
+            },
+            "C:\\OwnProjects\\DotNetWithReact\\Reactivities\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "C:\\OwnProjects\\DotNetWithReact\\Reactivities\\Infrastructure\\Infrastructure.csproj"
             }
           }
         }

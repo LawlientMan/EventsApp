@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, Header, Segment } from 'semantic-ui-react'
 import LoadingComponent from '../../app/layout/LoadingComponent'
-import { Activity } from '../../app/models/Activity'
+import { ActivityFormValues } from '../../app/models/Activity'
 import { useStore } from '../../app/stores/store'
 import { v4 as uuid } from 'uuid';
 import { Formik, Form } from 'formik'
@@ -16,23 +16,15 @@ import MyDateInput from '../../app/common/form/MyDateInput'
 
 const ActivityForm = () => {
   const { activityStore } = useStore();
-  const { loading, createActivity, editActivity, loadingInitial, loadActivity } = activityStore;
+  const { createActivity, editActivity, loadingInitial, loadActivity } = activityStore;
   const { id } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (id) loadActivity(id).then(act => setActivity(act!));
+    if (id) loadActivity(id).then(act => setActivity(new ActivityFormValues(act)));
   }, [loadActivity, id]);
 
-  const [activity, setActivity] = useState<Activity>({
-    id: '',
-    title: '',
-    date: null,
-    description: '',
-    category: '',
-    city: '',
-    venue: '',
-  });
+  const [activity, setActivity] = useState<ActivityFormValues>(new ActivityFormValues());
 
   const validationSchima = Yup.object({
     title: Yup.string().required('The activity title is requered'),
@@ -43,12 +35,15 @@ const ActivityForm = () => {
     venue: Yup.string().required('The activity venue is requered')
   });
 
-  function handleFormSubmit(activity: Activity) {
+  function handleFormSubmit(activity: ActivityFormValues) {
     if (activity.id) {
       editActivity(activity).then(() => navigate(`/activities/${activity.id}`));
     } else {
-      activity.id = uuid();
-      createActivity(activity).then(() => navigate(`/activities/${activity.id}`));
+      let newActivity = {
+        ...activity,
+        id: uuid()
+      };
+      createActivity(newActivity).then(() => navigate(`/activities/${newActivity.id}`));
     }
   }
 
@@ -80,7 +75,7 @@ const ActivityForm = () => {
             <MyTextInput placeholder='Venue' name='venue' />
             <Button
               disabled={ isSubmitting || !dirty || !isValid}
-              loading={loading}
+              loading={isSubmitting}
               floated='right'
               positive type='submit'
               content='Submit'

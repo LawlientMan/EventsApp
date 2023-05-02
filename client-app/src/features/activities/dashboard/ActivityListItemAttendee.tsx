@@ -18,7 +18,7 @@ const ActivityListItemAttendee = ({ attendees }: Props) => {
           hoverable
           key={a.username}
           trigger={
-            <List.Item key={a.username} as={Link} to={`/profoles/${a.username}`}>
+            <List.Item key={a.username} as={Link} to={`/profiles/${a.username}`}>
               <Image size='mini' circular src={a.image || '/assets/user.png'} />
             </List.Item>
           }

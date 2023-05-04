@@ -174,4 +174,8 @@ export default class ActivityStore {
             this.setLoading(false);
         }
     }
+
+    clearSelectedActivity = () =>{
+        this.selectedActivity = undefined;
+    }
 }

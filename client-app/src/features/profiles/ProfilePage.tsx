@@ -14,15 +14,16 @@ const ProfilePage = () => {
 
     useEffect(() => {
         if (username) loadProfile(username);
-    }, [username, loadProfile]);
+        return () => profileStore.setActiveTab(0)
+    }, [username, loadProfile, profileStore]);
 
-    if(loadingProfile) return <LoadingComponent content={`Loading "${username}'s" profile`} />;
+    if (loadingProfile) return <LoadingComponent content={`Loading "${username}'s" profile`} />;
 
     return (
         <Grid>
             <Grid.Column width={16}>
-                {profile && <ProfileHeader profile={profile}/>}
-                {profile && <ProfileContent profile={profile}/>}
+                {profile && <ProfileHeader profile={profile} />}
+                {profile && <ProfileContent profile={profile} />}
             </Grid.Column>
         </Grid>
     )

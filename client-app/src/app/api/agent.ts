@@ -1,10 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { toast } from 'react-toastify';
 import { Activity, ActivityFormValues } from '../models/Activity';
-import { Photo, Profile } from '../models/Profile';
+import { Photo, Profile, UserActivity } from '../models/Profile';
 import { User, UserFormValues } from '../models/User';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
+import { PaginatedResult } from '../models/Paginatin';
 
 const sleep = (deley: number) => {
     return new Promise((resolve) => {
@@ -14,7 +15,7 @@ const sleep = (deley: number) => {
 
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
-    if(token && config.headers){
+    if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -23,6 +24,11 @@ axios.interceptors.request.use(config => {
 
 axios.interceptors.response.use(async response => {
     await sleep(1000);
+    const pagination = response.headers['pagination'];
+    if (pagination) {
+        response.data = new PaginatedResult(response.data, JSON.parse(pagination));
+        return response as AxiosResponse<PaginatedResult<any>>
+    }
     return response;
 }, (error: AxiosError) => {
     const { data, status, config } = error.response as AxiosResponse;
@@ -76,7 +82,7 @@ const requests = {
 }
 
 const Activities = {
-    list: () => requests.get<Activity[]>('/activities'),
+    list: (params: URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities', { params }).then(responseBody),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
     create: (activity: ActivityFormValues) => requests.post<void>('/activities', activity),
     update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),
@@ -96,15 +102,17 @@ const Profiles = {
         let formData = new FormData();
         formData.append('file', file);
         return axios.post<Photo>('photos', formData, {
-            headers: {'Content-type': 'multipart/form-data'}
-        });        
+            headers: { 'Content-type': 'multipart/form-data' }
+        });
     },
-    setMainPhoto: (id: string) => requests.post<void>(`photos/${id}/SetMain`, {}),
-    deletePhoto: (id: string) => requests.del<void>(`photos/${id}`),
+    setMainPhoto: (id: string) => requests.post<void>(`/photos/${id}/SetMain`, {}),
+    deletePhoto: (id: string) => requests.del<void>(`/photos/${id}`),
     editProfile: (profile: Partial<Profile>) => requests.put<void>('/profiles', profile),
     updateFollowing: (username: string) => requests.post<void>(`/follow/${username}`, {}),
-    listFollowings: (username: string, predicate: string) => 
-        requests.get<Profile[]>(`follow/${username}?predicate=${predicate}`)
+    listFollowings: (username: string, predicate: string) =>
+        requests.get<Profile[]>(`/follow/${username}?predicate=${predicate}`),
+    listUserActivities: (username: string, predicate: string) =>
+        requests.get<UserActivity[]>(`/profiles/${username}/activities?predicate=${predicate}`)
 }
 
 const agent = {
